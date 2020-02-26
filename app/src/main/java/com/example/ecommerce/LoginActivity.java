@@ -10,14 +10,18 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.example.ecommerce.model.Users;
+import com.example.ecommerce.prevalent.Prevalent;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import io.paperdb.Paper;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -25,6 +29,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button login;
     private ProgressDialog loadingBar;
     private String parentDbName = "Users";
+    RadioButton radioButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +38,8 @@ public class LoginActivity extends AppCompatActivity {
         phone = findViewById(R.id.login_phone_no_input);
         password = findViewById(R.id.login_password_input);
         login = findViewById(R.id.login_btn);
+        radioButton=findViewById(R.id.remember_me);
+        Paper.init(this);
         loadingBar = new ProgressDialog(this);
 
         login.setOnClickListener(new View.OnClickListener() {
@@ -62,6 +69,11 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void Login(final String phoneno, final String passworD) {
+        if (radioButton.isChecked()){
+            Paper.book().write(Prevalent.userPhoneKey,phoneno);
+            Paper.book().write(Prevalent.userPasswordKey,passworD);
+
+        }
         final DatabaseReference rootRef;
         rootRef = FirebaseDatabase.getInstance().getReference();
         rootRef.addListenerForSingleValueEvent(new ValueEventListener() {
