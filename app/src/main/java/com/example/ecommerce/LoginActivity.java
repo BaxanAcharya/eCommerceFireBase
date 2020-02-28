@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ecommerce.model.Users;
@@ -30,17 +31,40 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressDialog loadingBar;
     private String parentDbName = "Users";
     RadioButton radioButton;
+    private TextView admin,notadmin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        admin=findViewById(R.id.admin_panel_link);
+        notadmin=findViewById(R.id.not_admin_panel_link);
         phone = findViewById(R.id.login_phone_no_input);
         password = findViewById(R.id.login_password_input);
         login = findViewById(R.id.login_btn);
         radioButton=findViewById(R.id.remember_me);
         Paper.init(this);
         loadingBar = new ProgressDialog(this);
+
+        admin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                login.setText("Login Admin");
+                admin.setVisibility(View.INVISIBLE);
+                notadmin.setVisibility(View.VISIBLE);
+                parentDbName="Admins";
+            }
+        });
+
+        notadmin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                login.setText("Login");
+                admin.setVisibility(View.VISIBLE);
+                notadmin.setVisibility(View.INVISIBLE);
+                parentDbName="Users";
+            }
+        });
 
         login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,10 +107,18 @@ public class LoginActivity extends AppCompatActivity {
                     Users usersData = dataSnapshot.child(parentDbName).child(phoneno).getValue(Users.class);
                     if (usersData.getPhone().equals(phoneno)) {
                         if (usersData.getPassword().equals(passworD)) {
-                            Toast.makeText(LoginActivity.this, "Login success", Toast.LENGTH_SHORT).show();
-                            loadingBar.dismiss();
-                            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                            startActivity(intent);
+                           if (parentDbName.equals("Admins")){
+                               System.out.println("sdfd");
+                               Toast.makeText(LoginActivity.this, "Login success", Toast.LENGTH_SHORT).show();
+                               loadingBar.dismiss();
+                               Intent intent = new Intent(LoginActivity.this, AdminAddNewProductActivity.class);
+                               startActivity(intent);
+                           }else if (parentDbName.equals("Users")){
+                               Toast.makeText(LoginActivity.this, "Login success", Toast.LENGTH_SHORT).show();
+                               loadingBar.dismiss();
+                               Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                               startActivity(intent);
+                           }
                         }else{
                             Toast.makeText(LoginActivity.this, "Password credentials is incorrect", Toast.LENGTH_SHORT).show();
                             loadingBar.dismiss();
